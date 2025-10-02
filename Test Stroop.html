@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Interactive bilingualism simulation using the Stroop Effect. Understand how bilingual children's brains work through this educational game.">
+    <meta name="keywords" content="bilingualism, Stroop effect, educational game, cognitive control, dwujęzyczność">
+    <meta name="author" content="Bilingual Education Tool">
+    
+    <!-- Open Graph Meta Tags for Social Sharing -->
+    <meta property="og:title" content="Bilingual Brain Simulator - Stroop Effect Game">
+    <meta property="og:description" content="Experience how bilingual children's brains work through this interactive Stroop Effect simulation">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/667eea/ffffff?text=Bilingual+Brain+Simulator">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Bilingual Brain Simulator">
+    <meta name="twitter:description" content="Experience how bilingual children's brains work">
+    
+    <title>Bilingual Brain Simulator - Stroop Effect Educational Game</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            touch-action: manipulation;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+            position: relative;
+        }
+
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .lang-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: clamp(1.8em, 5vw, 2.5em);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: clamp(1em, 3vw, 1.1em);
+        }
+
+        .intro-screen, .game-screen, .results-screen, .info-screen {
+            display: none;
+        }
+
+        .intro-screen.active, .game-screen.active, .results-screen.active, .info-screen.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .intro-text {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .mode-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .mode-btn {
+            padding: 20px;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            user-select: none;
+        }
+
+        .mode-btn:hover, .mode-btn:active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .mode-btn h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .mode-btn p {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .word-display {
+            font-size: clamp(2.5em, 8vw, 4em);
+            font-weight: bold;
+            text-align: center;
+            margin: 40px 0;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .word-display.pulse {
+            animation: pulse 0.3s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .color-btn {
+            padding: 15px 25px;
+            font-size: clamp(1em, 3vw, 1.2em);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            user-select: none;
+        }
+
+        .color-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .color-btn:active {
+            transform: translateY(0);
+        }
+
+        .color-btn.correct {
+            animation: correctFlash 0.5s ease;
+        }
+
+        .color-btn.incorrect {
+            animation: incorrectFlash 0.5s ease;
+        }
+
+        @keyframes correctFlash {
+            0%, 100% { background-color: inherit; }
+            50% { background-color: #28a745; }
+        }
+
+        @keyframes incorrectFlash {
+            0%, 100% { background-color: inherit; }
+            50% { background-color: #dc3545; }
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-box h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .stat-box .value {
+            font-size: clamp(1.5em, 4vw, 2em);
+            font-weight: bold;
+            color: #333;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: clamp(1em, 3vw, 1.1em);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .btn-share {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-share:hover {
+            background: #218838;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .share-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .comparison-bars {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 200px;
+            margin: 20px 0;
+        }
+
+        .bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            max-width: 150px;
+        }
+
+        .bar {
+            width: clamp(40px, 8vw, 60px);
+            background: linear-gradient(to top, #667eea, #764ba2);
+            border-radius: 5px 5px 0 0;
+            transition: height 0.5s ease;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: clamp(0.8em, 2vw, 1em);
+        }
+
+        .bar-label {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            font-size: clamp(0.8em, 2vw, 1em);
+        }
+
+        .explanation-box {
+            background: #e8f4fd;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .explanation-box h3 {
+            color: #17a2b8;
+            margin-bottom: 10px;
+        }
+
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(2em, 8vw, 3em);
+            font-weight: bold;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .feedback.show {
+            opacity: 1;
+        }
+
+        .feedback.correct {
+            color: #28a745;
+        }
+
+        .feedback.incorrect {
+            color: #dc3545;
+        }
+
+        .url-display {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.9em;
+            user-select: all;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                border-radius: 15px;
+            }
+            
+            .language-toggle {
+                top: 10px;
+                right: 10px;
+            }
+            
+            .mode-selection {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .share-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                margin: 5px;
+                padding: 10px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .intro-text {
+                padding: 15px;
+                font-size: 0.95em;
+            }
+        }
+
+        /* Print styles for sharing results */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Language Toggle -->
+        <div class="language-toggle">
+            <button class="lang-btn active" onclick="setLanguage('pl')">🇵🇱 PL</button>
+            <button class="lang-btn" onclick="setLanguage('en')">🇬🇧 EN</button>
+        </div>
+
+        <!-- Intro Screen -->
+        <div class="intro-screen active">
+            <h1 data-i18n="title">Symulacja dwujęzyczności</h1>
+            <div class="subtitle" data-i18n="subtitle">Doświadcz jak pracuje mózg dwujęzycznych dzieci</div>
+            
+            <div class="intro-text">
+                <h3 data-i18n="whatIsStroop">Czym jest efekt Stroopa?</h3>
+                <p data-i18n="stroopExplanation">Efekt Stroopa to zjawisko pokazujące, jak nasz mózg przetwarza sprzeczne informacje. 
+                W tej grze zobaczysz słowa oznaczające kolory, ale napisane innym kolorem. 
+                Twoim zadaniem będzie wskazanie KOLORU, którym słowo jest napisane, a nie tego co oznacza!</p>
+                
+                <br>
+                <h3 data-i18n="bilingualConnection">Co to ma wspólnego z dwujęzycznością?</h3>
+                <p data-i18n="bilingualExplanation">Dwujęzyczne dzieci codziennie doświadczają podobnego wyzwania - muszą wybierać między dwoma systemami językowymi. 
+                Ta gra pomoże Ci zrozumieć, jak ich mózgi nieustannie żonglują dwoma językami!</p>
+            </div>
+            
+            <div class="mode-selection">
+                <div class="mode-btn" onclick="startGame('warmup')">
+                    <h3>🎯 <span data-i18n="warmupTitle">Rozgrzewka</span></h3>
+                    <p data-i18n="warmupDesc">Proste kolory bez tekstu</p>
+                </div>
+                <div class="mode-btn" onclick="startGame('polish')">
+                    <h3>🇵🇱 <span data-i18n="polishTitle">Polski</span></h3>
+                    <p data-i18n="polishDesc">Słowa po polsku</p>
+                </div>
+                <div class="mode-btn" onclick="startGame('english')">
+                    <h3>🇬🇧 English</h3>
+                    <p data-i18n="englishDesc">Words in English</p>
+                </div>
+                <div class="mode-btn" onclick="startGame('mixed')">
+                    <h3>🌍 <span data-i18n="mixedTitle">Mieszany</span></h3>
+                    <p data-i18n="mixedDesc">Symulacja dwujęzyczności</p>
+                </div>
+            </div>
+            
+            <div class="center">
+                <button class="btn btn-info" onclick="showInfo()">ℹ️ <span data-i18n="moreInfo">Więcej informacji</span></button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-screen">
+            <h2 id="modeTitle" class="center">Game Mode</h2>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0/10</div>
+            </div>
+            
+            <div class="word-display" id="wordDisplay">
+                <span data-i18n="getReady">Przygotuj się...</span>
+            </div>
+            
+            <div class="button-grid" id="buttonGrid">
+                <!-- Buttons will be generated dynamically -->
+            </div>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <h4 data-i18n="correct">Poprawne</h4>
+                    <div class="value" id="correctCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <h4 data-i18n="reactionTime">Czas reakcji</h4>
+                    <div class="value" id="avgTime">0ms</div>
+                </div>
+                <div class="stat-box">
+                    <h4 data-i18n="streak">Seria</h4>
+                    <div class="value" id="streak">0</div>
+                </div>
+            </div>
+            
+            <div class="center">
+                <button class="btn btn-secondary" onclick="backToMenu()"><span data-i18n="backToMenu">Powrót do menu</span></button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen">
+            <h1>📊 <span data-i18n="yourResults">Twoje Wyniki</span></h1>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <h4 data-i18n="accuracy">Dokładność</h4>
+                    <div class="value" id="finalAccuracy">0%</div>
+                </div>
+                <div class="stat-box">
+                    <h4 data-i18n="avgTime">Średni czas</h4>
+                    <div class="value" id="finalAvgTime">0ms</div>
+                </div>
+                <div class="stat-box">
+                    <h4 data-i18n="bestStreak">Najlepsza seria</h4>
+                    <div class="value" id="finalBestStreak">0</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3 data-i18n="modeComparison">Porównanie trybów</h3>
+                <div class="comparison-bars" id="comparisonChart">
+                    <!-- Charts will be generated dynamically -->
+                </div>
+            </div>
+            
+            <div class="explanation-box">
+                <h3>💡 <span data-i18n="whatItMeans">Co to oznacza?</span></h3>
+                <p id="resultExplanation"></p>
+            </div>
+
+            <div class="share-section">
+                <h3 data-i18n="shareResults">Podziel się wynikami!</h3>
+                <div class="share-buttons">
+                    <button class="btn btn-share" onclick="shareResults('twitter')">🐦 Twitter</button>
+                    <button class="btn btn-share" onclick="shareResults('facebook')">📘 Facebook</button>
+                    <button class="btn btn-share" onclick="shareResults('linkedin')">💼 LinkedIn</button>
+                    <button class="btn btn-primary" onclick="copyShareLink()">📋 <span data-i18n="copyLink">Kopiuj link</span></button>
+                </div>
+            </div>
+            
+            <div class="center">
+                <button class="btn btn-primary" onclick="backToMenu()"><span data-i18n="tryAgain">Spróbuj ponownie</span></button>
+                <button class="btn btn-info" onclick="showInfo()"><span data-i18n="learnMore">Dowiedz się więcej</span></button>
+            </div>
+        </div>
+
+        <!-- Info Screen -->
+        <div class="info-screen">
+            <h1>📚 <span data-i18n="bilingualismInChildren">Dwujęzyczność u Dzieci</span></h1>
+            
+            <div class="intro-text">
+                <h3 data-i18n="howStroopHelps">Jak efekt Stroopa pomaga zrozumieć dwujęzyczność?</h3>
+                <div data-i18n="infoContent">
+                    <p>Kiedy grałeś w tę grę, Twój mózg musiał:</p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Hamować automatyczną odpowiedź (czytanie słowa)</li>
+                        <li>Aktywować właściwą odpowiedź (nazywanie koloru)</li>
+                        <li>Przełączać się między różnymi trybami myślenia</li>
+                    </ul>
+                    
+                    <p><strong>Dokładnie to samo robią dwujęzyczne dzieci każdego dnia!</strong> Ich mózgi nieustannie:</p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Wybierają właściwy język w danej sytuacji</li>
+                        <li>Hamują język, którego akurat nie używają</li>
+                        <li>Przełączają się między językami (code-switching)</li>
+                    </ul>
+                    
+                    <h3 style="margin-top: 20px;">Korzyści dwujęzyczności:</h3>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Lepsza kontrola poznawcza</strong> - dwujęzyczne dzieci lepiej radzą sobie z zadaniami wymagającymi koncentracji</li>
+                        <li><strong>Elastyczność myślenia</strong> - łatwiej przełączają się między różnymi zadaniami</li>
+                        <li><strong>Rozwiązywanie problemów</strong> - potrafią spojrzeć na problem z różnych perspektyw</li>
+                        <li><strong>Opóźnienie demencji</strong> - badania pokazują, że dwujęzyczność może opóźnić objawy demencji o 4-5 lat</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="share-section">
+                <h3 data-i18n="shareEducational">Podziel się tą edukacyjną grą</h3>
+                <div class="url-display" id="shareUrl">https://yourdomain.com/bilingual-test</div>
+                <div class="share-buttons">
+                    <button class="btn btn-primary" onclick="copyShareLink()">📋 <span data-i18n="copyLink">Kopiuj link</span></button>
+                </div>
+            </div>
+            
+            <div class="center">
+                <button class="btn btn-primary" onclick="backToMenu()"><span data-i18n="backToGame">Wróć do gry</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <script>
+        // Game State
+        let gameState = {
+            mode: '',
+            currentRound: 0,
+            maxRounds: 10,
+            correct: 0,
+            times: [],
+            currentStreak: 0,
+            bestStreak: 0,
+            startTime: 0,
+            results: {},
+            language: 'pl'
+        };
+
+        // Translations
+        const translations = {
+            pl: {
+                title: "Symulacja dwujęzyczności",
+                subtitle: "Doświadcz jak pracuje mózg dwujęzycznych dzieci",
+                whatIsStroop: "Czym jest efekt Stroopa?",
+                stroopExplanation: "Efekt Stroopa to zjawisko pokazujące, jak nasz mózg przetwarza sprzeczne informacje. W tej grze zobaczysz słowa oznaczające kolory, ale napisane innym kolorem. Twoim zadaniem będzie wskazanie KOLORU, którym słowo jest napisane, a nie tego co oznacza!",
+                bilingualConnection: "Co to ma wspólnego z dwujęzycznością?",
+                bilingualExplanation: "Dwujęzyczne dzieci codziennie doświadczają podobnego wyzwania - muszą wybierać między dwoma systemami językowymi. Ta gra pomoże Ci zrozumieć, jak ich mózgi nieustannie żonglują dwoma językami!",
+                warmupTitle: "Rozgrzewka",
+                warmupDesc: "Proste kolory bez tekstu",
+                polishTitle: "Polski",
+                polishDesc: "Słowa po polsku",
+                englishDesc: "Words in English",
+                mixedTitle: "Mieszany",
+                mixedDesc: "Symulacja dwujęzyczności",
+                moreInfo: "Więcej informacji",
+                getReady: "Przygotuj się...",
+                correct: "Poprawne",
+                reactionTime: "Czas reakcji",
+                streak: "Seria",
+                backToMenu: "Powrót do menu",
+                yourResults: "Twoje Wyniki",
+                accuracy: "Dokładność",
+                avgTime: "Średni czas",
+                bestStreak: "Najlepsza seria",
+                modeComparison: "Porównanie trybów",
+                whatItMeans: "Co to oznacza?",
+                shareResults: "Podziel się wynikami!",
+                copyLink: "Kopiuj link",
+                tryAgain: "Spróbuj ponownie",
+                learnMore: "Dowiedz się więcej",
+                bilingualismInChildren: "Dwujęzyczność u Dzieci",
+                howStroopHelps: "Jak efekt Stroopa pomaga zrozumieć dwujęzyczność?",
+                shareEducational: "Podziel się tą edukacyjną grą",
+                backToGame: "Wróć do gry"
+            },
+            en: {
+                title: "Bilingualism Simulation",
+                subtitle: "Experience how bilingual children's brains work",
+                whatIsStroop: "What is the Stroop Effect?",
+                stroopExplanation: "The Stroop Effect is a phenomenon showing how our brain processes conflicting information. In this game, you'll see color words written in different colors. Your task is to identify the COLOR of the text, not what it says!",
+                bilingualConnection: "What does this have to do with bilingualism?",
+                bilingualExplanation: "Bilingual children experience a similar challenge daily - they must choose between two language systems. This game will help you understand how their brains constantly juggle two languages!",
+                warmupTitle: "Warm-up",
+                warmupDesc: "Simple colors without text",
+                polishTitle: "Polish",
+                polishDesc: "Words in Polish",
+                englishDesc: "Words in English",
+                mixedTitle: "Mixed",
+                mixedDesc: "Bilingualism simulation",
+                moreInfo: "More information",
+                getReady: "Get ready...",
+                correct: "Correct",
+                reactionTime: "Reaction time",
+                streak: "Streak",
+                backToMenu: "Back to menu",
+                yourResults: "Your Results",
+                accuracy: "Accuracy",
+                avgTime: "Average time",
+                bestStreak: "Best streak",
+                modeComparison: "Mode comparison",
+                whatItMeans: "What does it mean?",
+                shareResults: "Share your results!",
+                copyLink: "Copy link",
+                tryAgain: "Try again",
+                learnMore: "Learn more",
+                bilingualismInChildren: "Bilingualism in Children",
+                howStroopHelps: "How does the Stroop Effect help understand bilingualism?",
+                shareEducational: "Share this educational game",
+                backToGame: "Back to game"
+            }
+        };
+
+        // Colors and words
+        const colors = {
+            red: '#e74c3c',
+            blue: '#3498db',
+            green: '#27ae60',
+            yellow: '#f1c40f'
+        };
+
+        const colorNamesPolish = {
+            red: 'CZERWONY',
+            blue: 'NIEBIESKI',
+            green: 'ZIELONY',
+            yellow: 'ŻÓŁTY'
+        };
+
+        const colorNamesEnglish = {
+            red: 'RED',
+            blue: 'BLUE',
+            green: 'GREEN',
+            yellow: 'YELLOW'
+        };
+
+        const colorButtonsPolish = {
+            red: 'Czerwony',
+            blue: 'Niebieski',
+            green: 'Zielony',
+            yellow: 'Żółty'
+        };
+
+        const colorButtonsEnglish = {
+            red: 'Red',
+            blue: 'Blue',
+            green: 'Green',
+            yellow: 'Yellow'
+        };
+
+        // Language functions
+        function setLanguage(lang) {
+            gameState.language = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update all translatable elements
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    if (element.tagName === 'DIV' && key === 'infoContent') {
+                        // Special handling for info content - don't update during game
+                        if (!document.querySelector('.game-screen').classList.contains('active')) {
+                            element.innerHTML = getInfoContent(lang);
+                        }
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
+                }
+            });
+        }
+
+        function getInfoContent(lang) {
+            if (lang === 'en') {
+                return `
+                    <p>When you played this game, your brain had to:</p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Inhibit automatic response (reading the word)</li>
+                        <li>Activate correct response (naming the color)</li>
+                        <li>Switch between different thinking modes</li>
+                    </ul>
+                    
+                    <p><strong>This is exactly what bilingual children do every day!</strong> Their brains constantly:</p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>Choose the right language for the situation</li>
+                        <li>Inhibit the language they're not using</li>
+                        <li>Switch between languages (code-switching)</li>
+                    </ul>
+                    
+                    <h3 style="margin-top: 20px;">Benefits of bilingualism:</h3>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>Better cognitive control</strong> - bilingual children handle concentration tasks better</li>
+                        <li><strong>Mental flexibility</strong> - easier switching between different tasks</li>
+                        <li><strong>Problem solving</strong> - ability to see problems from different perspectives</li>
+                        <li><strong>Delayed dementia</strong> - research shows bilingualism can delay dementia symptoms by 4-5 years</li>
+                    </ul>
+                `;
+            }
+            // Return Polish version (default)
+            return document.querySelector('[data-i18n="infoContent"]').innerHTML;
+        }
+
+        // Helper functions
+        function showScreen(screenClass) {
+            document.querySelectorAll('.intro-screen, .game-screen, .results-screen, .info-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.querySelector(`.${screenClass}`).classList.add('active');
+        }
+
+        function startGame(mode) {
+            gameState = {
+                ...gameState,
+                mode: mode,
+                currentRound: 0,
+                maxRounds: 10,
+                correct: 0,
+                times: [],
+                currentStreak: 0,
+                bestStreak: 0,
+                startTime: 0,
+                results: {}
+            };
+
+            // Set mode title
+            const titles = {
+                warmup: gameState.language === 'en' ? '🎯 Warm-up - Basic colors' : '🎯 Rozgrzewka - Podstawowe kolory',
+                polish: '🇵🇱 Tryb Polski',
+                english: '🇬🇧 English Mode',
+                mixed: gameState.language === 'en' ? '🌍 Mixed Mode - Bilingualism Simulation' : '🌍 Tryb Mieszany - Symulacja Dwujęzyczności'
+            };
+            document.getElementById('modeTitle').textContent = titles[mode];
+
+            // Prepare buttons
+            setupButtons(mode);
+            
+            // Show game screen
+            showScreen('game-screen');
+            
+            // Start round after brief pause
+            setTimeout(() => nextRound(), 1000);
+        }
+
+        function setupButtons(mode) {
+            const buttonGrid = document.getElementById('buttonGrid');
+            buttonGrid.innerHTML = '';
+
+            const buttonLabels = (mode === 'english' || gameState.language === 'en') ? colorButtonsEnglish : colorButtonsPolish;
+
+            Object.keys(colors).forEach(color => {
+                const btn = document.createElement('button');
+                btn.className = 'color-btn';
+                btn.style.backgroundColor = colors[color];
+                btn.textContent = buttonLabels[color];
+                btn.onclick = () => checkAnswer(color);
+                buttonGrid.appendChild(btn);
+            });
+        }
+
+        function nextRound() {
+            if (gameState.currentRound >= gameState.maxRounds) {
+                endGame();
+                return;
+            }
+
+            gameState.currentRound++;
+            updateProgress();
+
+            const wordDisplay = document.getElementById('wordDisplay');
+            wordDisplay.classList.remove('pulse');
+            
+            // Generate random word and color
+            const colorKeys = Object.keys(colors);
+            const textColor = colorKeys[Math.floor(Math.random() * colorKeys.length)];
+            let displayText, wordMeaning;
+
+            if (gameState.mode === 'warmup') {
+                // Only color, no text
+                displayText = '████████';
+                wordMeaning = textColor;
+            } else if (gameState.mode === 'polish') {
+                wordMeaning = colorKeys[Math.floor(Math.random() * colorKeys.length)];
+                displayText = colorNamesPolish[wordMeaning];
+            } else if (gameState.mode === 'english') {
+                wordMeaning = colorKeys[Math.floor(Math.random() * colorKeys.length)];
+                displayText = colorNamesEnglish[wordMeaning];
+            } else if (gameState.mode === 'mixed') {
+                // Randomly choose language
+                wordMeaning = colorKeys[Math.floor(Math.random() * colorKeys.length)];
+                displayText = Math.random() > 0.5 ? colorNamesPolish[wordMeaning] : colorNamesEnglish[wordMeaning];
+            }
+
+            wordDisplay.textContent = displayText;
+            wordDisplay.style.color = colors[textColor];
+            wordDisplay.classList.add('pulse');
+            
+            // Save correct answer and start timer
+            gameState.correctAnswer = textColor;
+            gameState.startTime = Date.now();
+        }
+
+        function checkAnswer(color) {
+            const reactionTime = Date.now() - gameState.startTime;
+            gameState.times.push(reactionTime);
+
+            const isCorrect = color === gameState.correctAnswer;
+            
+            if (isCorrect) {
+                gameState.correct++;
+                gameState.currentStreak++;
+                if (gameState.currentStreak > gameState.bestStreak) {
+                    gameState.bestStreak = gameState.currentStreak;
+                }
+                showFeedback('✓', 'correct');
+            } else {
+                gameState.currentStreak = 0;
+                showFeedback('✗', 'incorrect');
+            }
+
+            updateStats();
+            
+            // Find clicked button
+            const buttons = document.querySelectorAll('.color-btn');
+            buttons.forEach(btn => {
+                if (btn.style.backgroundColor === colors[color] || 
+                    btn.style.backgroundColor === `rgb(${hexToRgb(colors[color]).join(', ')})`) {
+                    btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    setTimeout(() => {
+                        btn.classList.remove('correct', 'incorrect');
+                    }, 500);
+                }
+            });
+
+            // Next round
+            setTimeout(() => nextRound(), 1000);
+        }
+        
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? [
+                parseInt(result[1], 16),
+                parseInt(result[2], 16),
+                parseInt(result[3], 16)
+            ] : null;
+        }
+
+        function showFeedback(text, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = text;
+            feedback.className = `feedback ${type}`;
+            feedback.classList.add('show');
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 800);
+        }
+
+        function updateProgress() {
+            const fill = document.getElementById('progressFill');
+            const percentage = (gameState.currentRound / gameState.maxRounds) * 100;
+            fill.style.width = percentage + '%';
+            fill.textContent = `${gameState.currentRound}/${gameState.maxRounds}`;
+        }
+
+        function updateStats() {
+            document.getElementById('correctCount').textContent = gameState.correct;
+            document.getElementById('streak').textContent = gameState.currentStreak;
+            
+            if (gameState.times.length > 0) {
+                const avgTime = Math.round(gameState.times.reduce((a, b) => a + b, 0) / gameState.times.length);
+                document.getElementById('avgTime').textContent = avgTime + 'ms';
+            }
+        }
+
+        function endGame() {
+            // Save results for this mode
+            const accuracy = Math.round((gameState.correct / gameState.maxRounds) * 100);
+            const avgTime = Math.round(gameState.times.reduce((a, b) => a + b, 0) / gameState.times.length);
+            
+            // Save in localStorage for comparison
+            const savedResults = JSON.parse(localStorage.getItem('stroopResults') || '{}');
+            savedResults[gameState.mode] = {
+                accuracy: accuracy,
+                avgTime: avgTime,
+                bestStreak: gameState.bestStreak
+            };
+            localStorage.setItem('stroopResults', JSON.stringify(savedResults));
+
+            // Show results
+            document.getElementById('finalAccuracy').textContent = accuracy + '%';
+            document.getElementById('finalAvgTime').textContent = avgTime + 'ms';
+            document.getElementById('finalBestStreak').textContent = gameState.bestStreak;
+
+            // Generate comparison chart
+            generateComparisonChart(savedResults);
+            
+            // Generate explanation
+            generateExplanation(accuracy, avgTime, gameState.mode);
+            
+            showScreen('results-screen');
+        }
+
+        function generateComparisonChart(results) {
+            const chartContainer = document.getElementById('comparisonChart');
+            chartContainer.innerHTML = '';
+
+            const modes = ['warmup', 'polish', 'english', 'mixed'];
+            const modeNames = {
+                warmup: gameState.language === 'en' ? 'Warm-up' : 'Rozgrzewka',
+                polish: 'Polski',
+                english: 'English',
+                mixed: gameState.language === 'en' ? 'Mixed' : 'Mieszany'
+            };
+
+            modes.forEach(mode => {
+                if (results[mode]) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'bar-wrapper';
+                    
+                    const bar = document.createElement('div');
+                    bar.className = 'bar';
+                    bar.style.height = (results[mode].accuracy * 2) + 'px';
+                    bar.textContent = results[mode].accuracy + '%';
+                    
+                    const label = document.createElement('div');
+                    label.className = 'bar-label';
+                    label.textContent = modeNames[mode];
+                    
+                    wrapper.appendChild(bar);
+                    wrapper.appendChild(label);
+                    chartContainer.appendChild(wrapper);
+                }
+            });
+        }
+
+        function generateExplanation(accuracy, avgTime, mode) {
+            const explanation = document.getElementById('resultExplanation');
+            let text = '';
+
+            if (gameState.language === 'en') {
+                if (mode === 'warmup') {
+                    text = `In warm-up mode, you achieved ${accuracy}% correct answers with an average reaction time of ${avgTime}ms. This is your baseline - without cognitive conflict, your brain works quickly and efficiently.`;
+                } else if (mode === 'mixed') {
+                    text = `In mixed mode (${accuracy}% correct, ${avgTime}ms average time) you experienced what bilingual children go through daily. `;
+                    
+                    if (avgTime > 800) {
+                        text += 'The longer reaction time shows how your brain had to work to handle the conflict between languages. ';
+                    }
+                    
+                    text += 'Bilingual children develop stronger cognitive control precisely through constant training in such situations!';
+                } else {
+                    text = `You achieved ${accuracy}% correct answers with an average time of ${avgTime}ms. `;
+                    
+                    if (accuracy < 70) {
+                        text += 'The Stroop effect was clearly visible - the conflict between word meaning and color made the task difficult. ';
+                    } else if (accuracy >= 90) {
+                        text += 'Great result! Your cognitive control handled the information conflict well. ';
+                    }
+                    
+                    text += 'Imagine that bilingual children perform similar "brain gymnastics" every time they switch between languages!';
+                }
+            } else {
+                // Polish explanations
+                if (mode === 'warmup') {
+                    text = `W trybie rozgrzewki uzyskałeś ${accuracy}% poprawnych odpowiedzi ze średnim czasem reakcji ${avgTime}ms. To Twój punkt odniesienia - bez konfliktu poznawczego Twój mózg działa szybko i sprawnie.`;
+                } else if (mode === 'mixed') {
+                    text = `W trybie mieszanym (${accuracy}% poprawnych, ${avgTime}ms średniego czasu) doświadczyłeś tego, co dwujęzyczne dzieci przeżywają codziennie. `;
+                    
+                    if (avgTime > 800) {
+                        text += 'Dłuższy czas reakcji pokazuje, jak Twój mózg musiał pracować, aby poradzić sobie z konfliktem między językami. ';
+                    }
+                    
+                    text += 'Dwujęzyczne dzieci rozwijają silniejszą kontrolę poznawczą właśnie dzięki ciągłemu treningowi w takich sytuacjach!';
+                } else {
+                    text = `Uzyskałeś ${accuracy}% poprawnych odpowiedzi ze średnim czasem ${avgTime}ms. `;
+                    
+                    if (accuracy < 70) {
+                        text += 'Efekt Stroopa był wyraźnie widoczny - konflikt między znaczeniem słowa a jego kolorem utrudniał zadanie. ';
+                    } else if (accuracy >= 90) {
+                        text += 'Świetny wynik! Twoja kontrola poznawcza dobrze poradziła sobie z konfliktem informacji. ';
+                    }
+                    
+                    text += 'Wyobraź sobie, że dwujęzyczne dzieci wykonują podobną "gimnastykę mózgu" za każdym razem, gdy przełączają się między językami!';
+                }
+            }
+
+            explanation.textContent = text;
+        }
+
+        function backToMenu() {
+            showScreen('intro-screen');
+        }
+
+        function showInfo() {
+            showScreen('info-screen');
+        }
+
+        function shareResults(platform) {
+            const accuracy = document.getElementById('finalAccuracy')?.textContent || '0%';
+            const text = gameState.language === 'en' 
+                ? `I just tested my brain with the Bilingual Stroop Effect game! My accuracy: ${accuracy}. Try it yourself and see how bilingual children's brains work!`
+                : `Właśnie przetestowałem swój mózg grą Efekt Stroopa! Moja dokładność: ${accuracy}. Spróbuj sam i zobacz jak pracują mózgi dwujęzycznych dzieci!`;
+            
+            const url = window.location.href;
+            
+            switch(platform) {
+                case 'twitter':
+                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+                    break;
+                case 'facebook':
+                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+                    break;
+                case 'linkedin':
+                    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+                    break;
+            }
+        }
+
+        function copyShareLink() {
+            const url = window.location.href;
+            const shareUrl = document.getElementById('shareUrl');
+            if (shareUrl) {
+                shareUrl.textContent = url;
+            }
+            
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = gameState.language === 'en' ? '✓ Copied!' : '✓ Skopiowano!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set initial language based on browser
+            const browserLang = navigator.language.startsWith('pl') ? 'pl' : 'en';
+            setLanguage(browserLang);
+            
+            // Update share URL
+            const shareUrl = document.getElementById('shareUrl');
+            if (shareUrl) {
+                shareUrl.textContent = window.location.href;
+            }
+        });
+
+        // Add keyboard support for better accessibility
+        document.addEventListener('keydown', (e) => {
+            if (document.querySelector('.game-screen').classList.contains('active')) {
+                const buttons = document.querySelectorAll('.color-btn');
+                if (e.key >= '1' && e.key <= '4') {
+                    const index = parseInt(e.key) - 1;
+                    if (buttons[index]) {
+                        buttons[index].click();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
